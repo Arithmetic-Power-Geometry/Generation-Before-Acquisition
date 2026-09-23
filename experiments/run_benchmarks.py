@@ -1,55 +1,82 @@
-import csv, json, math, os, random, statistics, time
-from rfs import rfs_sort, ResourceVector
-from rfs.algorithms import merge_sort, quick_sort, indirect_sort, certificate_partition_sort
+from __future__ import annotations
 
-OUT="artifacts"
-os.makedirs(OUT,exist_ok=True)
+import csv
+import json
+from math import isinf
+from pathlib import Path
 
-def datasets(n,seed=42):
-    rng=random.Random(seed)
-    uniform=[rng.randrange(0,10*n) for _ in range(n)]
-    nearly=list(range(n))
-    for _ in range(max(1,n//100)):
-        i,j=rng.randrange(n),rng.randrange(n); nearly[i],nearly[j]=nearly[j],nearly[i]
-    clustered=[]
-    for b in range(100):
-        base=b*100000
-        clustered.extend(base+rng.randrange(1000) for _ in range(n//100))
-    while len(clustered)<n: clustered.append(rng.randrange(1000))
-    rng.shuffle(clustered)
-    return {"uniform":uniform,"nearly_sorted":nearly,"clustered":clustered}
+from rfs import Experiment, CapabilityStage, DecisionProblem, decision_kernel, minimum_acquisition_cost, classify_transition
 
-def timed(fn,xs,reps=3):
-    ts=[]; out=None
-    for _ in range(reps):
-        a=list(xs); t=time.perf_counter(); out=fn(a); ts.append(time.perf_counter()-t)
-    assert out==sorted(xs)
-    return statistics.median(ts)
 
-rows=[]
-for n in [1000,5000,10000]:
-    for kind,xs in datasets(n).items():
-        span=max(xs)-min(xs)+1 if xs else 1
-        width=max(1,math.ceil(span/32))
-        cert=lambda x,w=width,m=min(xs): (x-m)//w
-        algs={"python_timsort":lambda a:sorted(a),"merge_sort":lambda a:merge_sort(a),"quick_sort":lambda a:quick_sort(a),"indirect_sort":lambda a:indirect_sort(a),"certificate_partition":lambda a:certificate_partition_sort(a,cert),"rfs":lambda a:rfs_sort(a,certificate=cert)[0]}
-        for name,fn in algs.items():
-            rows.append({"n":n,"dataset":kind,"algorithm":name,"seconds":timed(fn,xs)})
+def problem_suite():
+    worlds = ("w0", "w1", "w2", "w3")
+    decisions = {"w0": 0, "w1": 0, "w2": 1, "w3": 1}
 
-with open(f"{OUT}/benchmark.csv","w",newline="") as f:
-    w=csv.DictWriter(f,fieldnames=rows[0].keys()); w.writeheader(); w.writerows(rows)
+    expensive = Experiment("expensive_resolver", 100.0, {"w0": 0, "w1": 0, "w2": 1, "w3": 1})
+    irrelevant = Experiment("new_but_irrelevant", 1.0, {"w0": 0, "w1": 1, "w2": 0, "w3": 1})
+    medium = Experiment("medium_resolver", 20.0, {"w0": 0, "w1": 0, "w2": 1, "w3": 1})
+    cheap = Experiment("cheap_resolver", 2.0, {"w0": 0, "w1": 0, "w2": 1, "w3": 1})
 
-resource_rows=[]
-for n in [1000,5000,10000,50000]:
-    rng=random.Random(n); xs=[rng.randrange(0,10*n) for _ in range(n)]
-    width=max(1,(10*n)//32); cert=lambda x,w=width:x//w
-    for profile,weights in {"comparison_expensive":ResourceVector(comparisons=10,time=1),"write_expensive":ResourceVector(comparisons=1,writes=100,time=1),"balanced":ResourceVector(comparisons=1,time=1,writes=1,movement=1)}.items():
-        out,m=rfs_sort(xs,certificate=cert,weights=weights); assert out==sorted(xs)
-        resource_rows.append({"n":n,"profile":profile,**m})
+    null_intensive = DecisionProblem(
+        worlds,
+        decisions,
+        (
+            CapabilityStage(0.0, (expensive,)),
+            CapabilityStage(1.0, (expensive, irrelevant)),
+            CapabilityStage(2.0, (expensive, irrelevant, medium)),
+            CapabilityStage(3.0, (expensive, irrelevant, medium, cheap)),
+        ),
+    )
 
-with open(f"{OUT}/resource_metrics.csv","w",newline="") as f:
-    keys=resource_rows[0].keys(); w=csv.DictWriter(f,fieldnames=keys); w.writeheader(); w.writerows(resource_rows)
+    constant = Experiment("constant", 1.0, {"w0": 0, "w1": 0, "w2": 0, "w3": 0})
+    splitter = Experiment("new_separator", 5.0, {"w0": 0, "w1": 0, "w2": 1, "w3": 1})
+    extensive = DecisionProblem(
+        worlds,
+        decisions,
+        (
+            CapabilityStage(0.0, (constant,)),
+            CapabilityStage(1.0, (constant,)),
+            CapabilityStage(2.0, (constant, splitter)),
+        ),
+    )
+    return {"null_intensive": null_intensive, "extensive": extensive}
 
-summary={"claim":"RFS is experimental resource-relative exact sorting; no universal asymptotic speedup is claimed.","benchmark_rows":len(rows),"resource_rows":len(resource_rows),"datasets":["uniform","nearly_sorted","clustered"],"algorithms":["python_timsort","merge_sort","quick_sort","indirect_sort","certificate_partition","rfs"]}
-with open(f"{OUT}/summary.json","w") as f: json.dump(summary,f,indent=2)
-print(json.dumps(summary,indent=2))
+
+def main():
+    outdir = Path("artifacts")
+    outdir.mkdir(exist_ok=True)
+    rows = []
+    summary = {}
+
+    for name, p in problem_suite().items():
+        budgets = sorted({s.generation_budget for s in p.stages})
+        prev = None
+        summary[name] = {"budgets": budgets, "rows": []}
+        for g in budgets:
+            k = decision_kernel(p, g)
+            a = minimum_acquisition_cost(p, g)
+            regime = "initial" if prev is None else classify_transition(p, prev, g)
+            row = {
+                "problem": name,
+                "generation_budget": g,
+                "kernel_size": len(k),
+                "acquisition_cost": "inf" if isinf(a) else a,
+                "transition": regime,
+            }
+            rows.append(row)
+            summary[name]["rows"].append(row)
+            prev = g
+
+    with (outdir / "closure_cost_frontier.csv").open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+    with (outdir / "closure_cost_summary.json").open("w") as f:
+        json.dump(summary, f, indent=2)
+
+    print(json.dumps(summary, indent=2))
+
+
+if __name__ == "__main__":
+    main()
