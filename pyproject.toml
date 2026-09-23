@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "resolution-frontier-sort"
-version = "0.1.0"
-description = "Experimental resource-relative exact sorting"
+version = "0.2.0"
+description = "Exact finite validation of generated experiment closure and residual acquisition cost"
 requires-python = ">=3.10"
 
 [tool.pytest.ini_options]
