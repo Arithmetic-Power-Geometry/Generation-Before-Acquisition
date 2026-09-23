@@ -1,0 +1,29 @@
+name: exhaustive-assumption-audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: python -m pip install -e . pytest
+      - name: Run complete tests
+        run: pytest -q
+      - name: Generate theorem-assumption artifacts
+        run: python experiments/assumption_audit.py
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: assumption-audit-artifacts
+          path: |
+            artifacts/assumption_audit.json
+            artifacts/step_frontier.csv
