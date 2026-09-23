@@ -4,9 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "resolution-frontier-sort"
-version = "0.2.0"
+version = "0.2.1"
 description = "Exact finite validation of generated experiment closure and residual acquisition cost"
 requires-python = ">=3.10"
+
+[tool.setuptools]
+packages = ["rfs"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
