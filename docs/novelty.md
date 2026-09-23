@@ -1,22 +1,38 @@
-# Novelty audit
+# Scientific positioning
 
-## Established neighboring results
+## Contribution boundary
 
-- Sorting under partial information already targets the number of compatible linear extensions.
-- Active ranking already chooses pairwise queries adaptively.
-- Non-uniform comparison-cost problems already exist.
-- Learned/prediction-assisted sorting already exploits imperfect side information.
+The candidate contribution is the joint decision-relative chain
 
-## What RFS does not claim
+[
+G \to \mathcal C_G \to K_D(G) \to A_D^\star(G),
+]
 
-RFS does not claim novelty for entropy-guided sorting, sorting a known partial order, adaptive pairwise comparisons, scalar comparison costs alone, learned ranks, or exploiting presortedness.
+where generation expenditure changes the reachable experiment family, the decision kernel records decision-incompatible worlds that remain inseparable, and residual acquisition cost is optimized only after that generated closure is fixed.
 
-## Surviving candidate gap
+## Neighboring literatures
 
-Each information-producing action e has a vector cost such as
+The repository does not claim novelty for:
 
-    c(e) = (time, energy, writes, movement, comparisons, fee, reliability).
+- costly information acquisition or rational inattention;
+- Blackwell comparison of experiments;
+- Test Cover / Minimum Test Collection;
+- optimal decision trees or decision-function evaluation for a fixed test family;
+- sensor placement, monitoring design, or value-of-information optimization;
+- separate installation/design and operating/measurement costs;
+- Lebesgue--Stieltjes decomposition.
 
-The goal is exact recovery of one total order while minimizing a chosen aggregate or Pareto criterion over those physical resources. The working progress variable is compatible-permutation entropy H_R = log2 |Omega|.
+Those are foundations or inner problems.
 
-**Status:** candidate model. Broader theory search and formal lower/upper bounds are still required before claiming foundational novelty.
+## Structural question
+
+The framework asks whether generated capability:
+
+1. changes neither kernel nor residual cost (null);
+2. lowers residual cost without changing the kernel (intensive);
+3. strictly shrinks the decision kernel (extensive);
+4. under nonpersistence, makes the system worse or structurally incomparable.
+
+An extensive transition that empties the kernel is a resolvability-class transition: exact finite resolution changes from impossible to possible under the finite deterministic assumptions.
+
+Computational enumeration validates the implementation and assumptions; it is not a substitute for mathematical proof and does not establish universal novelty.
