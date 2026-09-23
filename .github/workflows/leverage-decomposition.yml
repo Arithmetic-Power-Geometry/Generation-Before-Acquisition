@@ -1,0 +1,27 @@
+name: leverage-decomposition
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  decomposition-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: python -m pip install -e . pytest
+      - name: Run complete tests
+        run: pytest -q
+      - name: Generate decomposition artifact
+        run: python experiments/decomposition_audit.py
+      - name: Upload decomposition artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: leverage-decomposition-artifact
+          path: artifacts/leverage_decomposition.json
