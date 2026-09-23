@@ -1,4 +1,4 @@
-from experiments.assumption_audit import (
+from rfs.audit import (
     exhaustive_kernel_characterization,
     persistence_audit,
     nonpersistent_counterexample,
