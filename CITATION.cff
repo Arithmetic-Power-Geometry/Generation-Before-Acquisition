@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite the reference below."
+title: "Generation Before Acquisition"
+type: software
+version: "1.0.0"
+authors:
+  - family-names: "Akhtar"
+    given-names: "Mohammad Amir Khusru"
+    orcid: "https://orcid.org/0000-0002-3432-4199"
+    affiliation: "Usha Martin University"
+repository-code: "https://github.com/Arithmetic-Power-Geometry/Generation-Before-Acquisition"
+doi: "10.5281/zenodo.22921931"
+date-released: "2026-09-23"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Akhtar"
+      given-names: "Mohammad Amir Khusru"
+      orcid: "https://orcid.org/0000-0002-3432-4199"
+  title: "Generation Before Acquisition: Decision-Relative Capability Transitions in Costly Information Systems"
+  year: 2026
+  version: "V1"
+  doi: "10.5281/zenodo.22921931"
+  url: "https://doi.org/10.5281/zenodo.22921931"
