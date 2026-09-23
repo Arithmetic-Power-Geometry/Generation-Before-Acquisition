@@ -2,17 +2,15 @@
 
 **Decision-Relative Capability Transitions in Costly Information Systems**
 
-This repository is the reproducible computational companion to the theory of **generation before acquisition**. The central distinction is between spending resources to acquire evidence with capabilities that already exist and spending resources to generate new measurement capability that changes which experiments are reachable at all.
+This repository contains the computational development and exact finite validation of generation before acquisition: the distinction between acquiring evidence with capabilities that already exist and generating new measurement capability that changes which experiments are reachable.
 
-For a decision problem with worlds (W), decision map (D), and generation budget (G), the framework studies
+The computational framework follows:
 
-[
-G \longrightarrow \mathcal C_G \longrightarrow K_D(G) \longrightarrow A_D^\star(G),
-]
+`G -> C_G -> K_D(G) -> A_D^*(G)`
 
-where (mathcal C_G) is the reachable experiment family, (K_D(G)) is the decision kernel of decision-incompatible worlds that remain observationally indistinguishable, and (A_D^\star(G)) is residual exact acquisition cost.
+Here `C_G` is the reachable experiment family, `K_D(G)` is the decision kernel of decision-incompatible worlds that remain observationally indistinguishable, and `A_D^*(G)` is residual exact acquisition cost.
 
-## Main validated structures
+## Validated structures
 
 - finite deterministic kernel characterization;
 - null, intensive, extensive, regressive, and incomparable capability transitions;
@@ -21,23 +19,20 @@ where (mathcal C_G) is the reachable experiment family, (K_D(G)) is the decision
 - finite discrete lower-envelope capability frontiers;
 - bounded-variation leverage decomposition with smooth, jump, singular-continuous, and boundary cases.
 
-The exact finite implementation is deliberately audit-oriented rather than scale-oriented.
+The implementation is deliberately audit-oriented rather than scale-oriented.
 
-## Reproduce
+## Reproduction
 
-```bash
-python -m pip install -e .
-pytest -q
-python experiments/run_benchmarks.py
-python experiments/assumption_audit.py
-python experiments/frontier_theorem_audit.py
-python experiments/decomposition_audit.py
-```
+The `experiments/` directory contains the benchmark, assumption-audit, frontier-audit, and decomposition-audit programs. The `tests/` directory contains exact finite validation tests. GitHub Actions run the validation and audit programs and preserve result artifacts.
 
-GitHub Actions independently run the validation, assumption audit, finite-frontier audit, and leverage-decomposition audit and upload their result artifacts.
+## Scientific scope
 
-## Scientific boundary
+Costly information acquisition, Blackwell experiments, Test Cover, optimal decision trees, sensor placement, value of information, and Lebesgue--Stieltjes decomposition are neighboring foundations. This repository studies the decision-relative outer structure formed by generated reachable experiment closure, decision-kernel evolution, and residual acquisition cost/frontiers.
 
-The work does not claim novelty for costly information acquisition, Test Cover, optimal decision trees, sensor placement, value of information, or Lebesgue--Stieltjes decomposition individually. The contribution being tested is their decision-relative outer structure: **generated reachable experiment closure + decision-kernel evolution + residual acquisition cost/frontier**.
+See `CLAIM_LEDGER.md`, `RESULTS_MANIFEST.md`, and `docs/` for scientific scope, validation provenance, and interpretation.
 
-See `CLAIM_LEDGER.md`, `MANUSCRIPT_BLUEPRINT.md`, and `RESULTS_MANIFEST.md` for the frozen claim boundary and reproducibility provenance.
+## Citation
+
+Akhtar, M. A. K. (2026). *Generation Before Acquisition: Decision-Relative Capability Transitions in Costly Information Systems* (Version V1). Zenodo. DOI: 10.5281/zenodo.22921931
+
+Machine-readable citation metadata are provided in `CITATION.cff`.
