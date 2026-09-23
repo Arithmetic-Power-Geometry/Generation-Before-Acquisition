@@ -1,48 +1,46 @@
-# Resolution-Frontier Sort (RFS)
+# Resolution-Frontier-Sort — Closure/Cost Validation Lab
 
-**Research status:** experimental / candidate new model.
+This repository began as an attempt to find a genuinely new resource-aware sorting model. The unrestricted sorting branch was rejected after lower-bound and prior-art attacks. The repository is now retained as a reproducible **validation lab** for the surviving theory-level result: separating the cost of acquiring evidence inside an existing experimental closure from the cost of generating new decision-relevant capability.
 
-RFS reframes sorting as **eliminating unresolved ordering information at minimum resource cost**, not merely rearranging n objects.
+## Core objects
 
-## Research target
+For a finite deterministic decision problem:
 
-Classical comparison sorting has an Omega(n log n) lower bound for unrestricted arbitrary keys. RFS does not claim to beat that bound universally.
+- `C_G`: capability-generation cost.
+- `C_A`: evidence-acquisition cost.
+- `C_G` changes the reachable experiment closure.
+- `K_D(G)`: decision kernel — decision-critical world pairs not separated by any experiment reachable after generation budget `G`.
+- `A_D^*(G)`: exact minimum acquisition cost after generation budget `G`.
 
-The candidate model is:
+Under the finite deterministic assumptions used by the exact solver:
 
-> Given multiple information-producing operations with heterogeneous resource costs (time, energy, writes, data movement, exact-comparison cost, oracle fee, reliability), choose operations adaptively so that the compatible set of total orders collapses to one at minimum aggregate cost.
+`A_D^*(G) < infinity` iff `K_D(G)` is empty.
 
-Let Omega be the set of compatible permutations. Define unresolved ordering information as H_R = log2 |Omega|. For an action e with scalarized resource cost C_lambda(e), use the experimental score Gamma(e) = expected reduction in H_R divided by C_lambda(e).
+## Three validated regimes
 
-## What is already known
+1. **Null expansion** — the experiment set expands but neither the decision kernel nor optimal acquisition cost changes.
+2. **Intensive expansion** — the decision kernel is unchanged, but optimal acquisition cost falls.
+3. **Extensive expansion** — the decision kernel strictly shrinks; if the last unresolved critical pair disappears, exact resolution changes from impossible to possible.
 
-This repository does **not** claim novelty for sorting under partial information, entropy/linear-extension lower bounds, adaptive ranking, noisy active ranking, non-uniform comparison costs, or learned/prediction-assisted sorting.
+The code intentionally uses exhaustive finite search. Its purpose is theorem validation and auditability, not large-scale optimization.
 
-## Candidate gap
-
-The narrow candidate gap is **resource-relative exact sorting under heterogeneous information-production costs**, with vector-valued physical resources and exact fallback.
-
-## Included
-
-- RFS prototype
-- sound certificate partitioning
-- exact fallback
-- merge sort, quicksort, indirect sort and Python Timsort baselines
-- property/correctness tests
-- timing benchmarks
-- resource-profile experiments
-- GitHub Actions artifact generation
-
-## Where RFS may matter
-
-RFS is aimed at workloads where information and movement costs are heterogeneous: large database rows, persistent memory, distributed records, scientific objects with costly exact keys, sensor-derived ranking, and CPU/GPU/storage pipelines.
-
-It is not intended to beat optimized library sorting on ordinary small in-memory scalar arrays.
-
-## Reproduce
+## Reproduce locally
 
     python -m pip install -e .
     pytest -q
     python experiments/run_benchmarks.py
 
-Artifacts are written to `artifacts/` and uploaded by GitHub Actions as `rfs-artifacts`.
+Generated outputs:
+
+- `artifacts/closure_cost_frontier.csv`
+- `artifacts/closure_cost_summary.json`
+
+GitHub Actions uploads these as `closure-cost-artifacts`.
+
+## Scientific positioning
+
+This repository does **not** claim novelty for comparison sorting, sorting under partial information, Test Cover, Blackwell experiment comparison, costly information acquisition, rational inattention, active sensing, or fixed/variable information-production costs.
+
+The candidate contribution being validated is narrower: the joint use of a **generated reachable experiment closure**, a **decision kernel**, and **residual exact acquisition complexity**, together with the distinction between null, intensive, and extensive capability expansion.
+
+The manuscript should be written from frozen workflow artifacts rather than manually entered numbers.
