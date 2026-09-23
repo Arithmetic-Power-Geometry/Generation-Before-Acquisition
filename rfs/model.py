@@ -117,10 +117,17 @@ def minimum_adaptive_acquisition_cost(problem: DecisionProblem, generation_budge
 minimum_acquisition_cost = minimum_batch_acquisition_cost
 
 
+def _experiment_signature(e: Experiment):
+    """Hashable semantic signature used only for capability-set comparison."""
+    return (e.name, e.acquisition_cost, tuple((w, e.outcomes[w]) for w in sorted(e.outcomes, key=repr)))
+
+
 def is_persistent(problem: DecisionProblem) -> bool:
     stages = sorted(problem.stages, key=lambda s: s.generation_budget)
     for left, right in zip(stages, stages[1:]):
-        if not set(left.experiments).issubset(set(right.experiments)):
+        left_set = {_experiment_signature(e) for e in left.experiments}
+        right_set = {_experiment_signature(e) for e in right.experiments}
+        if not left_set.issubset(right_set):
             return False
     return True
 
