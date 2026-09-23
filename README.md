@@ -1,46 +1,43 @@
-# Resolution-Frontier-Sort — Closure/Cost Validation Lab
+# Generation Before Acquisition
 
-This repository began as an attempt to find a genuinely new resource-aware sorting model. The unrestricted sorting branch was rejected after lower-bound and prior-art attacks. The repository is now retained as a reproducible **validation lab** for the surviving theory-level result: separating the cost of acquiring evidence inside an existing experimental closure from the cost of generating new decision-relevant capability.
+**Decision-Relative Capability Transitions in Costly Information Systems**
 
-## Core objects
+This repository is the reproducible computational companion to the theory of **generation before acquisition**. The central distinction is between spending resources to acquire evidence with capabilities that already exist and spending resources to generate new measurement capability that changes which experiments are reachable at all.
 
-For a finite deterministic decision problem:
+For a decision problem with worlds (W), decision map (D), and generation budget (G), the framework studies
 
-- `C_G`: capability-generation cost.
-- `C_A`: evidence-acquisition cost.
-- `C_G` changes the reachable experiment closure.
-- `K_D(G)`: decision kernel — decision-critical world pairs not separated by any experiment reachable after generation budget `G`.
-- `A_D^*(G)`: exact minimum acquisition cost after generation budget `G`.
+[
+G \longrightarrow \mathcal C_G \longrightarrow K_D(G) \longrightarrow A_D^\star(G),
+]
 
-Under the finite deterministic assumptions used by the exact solver:
+where (mathcal C_G) is the reachable experiment family, (K_D(G)) is the decision kernel of decision-incompatible worlds that remain observationally indistinguishable, and (A_D^\star(G)) is residual exact acquisition cost.
 
-`A_D^*(G) < infinity` iff `K_D(G)` is empty.
+## Main validated structures
 
-## Three validated regimes
+- finite deterministic kernel characterization;
+- null, intensive, extensive, regressive, and incomparable capability transitions;
+- persistence monotonicity and an explicit nonpersistent counterexample;
+- separate exact batch and adaptive acquisition solvers;
+- finite discrete lower-envelope capability frontiers;
+- bounded-variation leverage decomposition with smooth, jump, singular-continuous, and boundary cases.
 
-1. **Null expansion** — the experiment set expands but neither the decision kernel nor optimal acquisition cost changes.
-2. **Intensive expansion** — the decision kernel is unchanged, but optimal acquisition cost falls.
-3. **Extensive expansion** — the decision kernel strictly shrinks; if the last unresolved critical pair disappears, exact resolution changes from impossible to possible.
+The exact finite implementation is deliberately audit-oriented rather than scale-oriented.
 
-The code intentionally uses exhaustive finite search. Its purpose is theorem validation and auditability, not large-scale optimization.
+## Reproduce
 
-## Reproduce locally
+```bash
+python -m pip install -e .
+pytest -q
+python experiments/run_benchmarks.py
+python experiments/assumption_audit.py
+python experiments/frontier_theorem_audit.py
+python experiments/decomposition_audit.py
+```
 
-    python -m pip install -e .
-    pytest -q
-    python experiments/run_benchmarks.py
+GitHub Actions independently run the validation, assumption audit, finite-frontier audit, and leverage-decomposition audit and upload their result artifacts.
 
-Generated outputs:
+## Scientific boundary
 
-- `artifacts/closure_cost_frontier.csv`
-- `artifacts/closure_cost_summary.json`
+The work does not claim novelty for costly information acquisition, Test Cover, optimal decision trees, sensor placement, value of information, or Lebesgue--Stieltjes decomposition individually. The contribution being tested is their decision-relative outer structure: **generated reachable experiment closure + decision-kernel evolution + residual acquisition cost/frontier**.
 
-GitHub Actions uploads these as `closure-cost-artifacts`.
-
-## Scientific positioning
-
-This repository does **not** claim novelty for comparison sorting, sorting under partial information, Test Cover, Blackwell experiment comparison, costly information acquisition, rational inattention, active sensing, or fixed/variable information-production costs.
-
-The candidate contribution being validated is narrower: the joint use of a **generated reachable experiment closure**, a **decision kernel**, and **residual exact acquisition complexity**, together with the distinction between null, intensive, and extensive capability expansion.
-
-The manuscript should be written from frozen workflow artifacts rather than manually entered numbers.
+See `CLAIM_LEDGER.md`, `MANUSCRIPT_BLUEPRINT.md`, and `RESULTS_MANIFEST.md` for the frozen claim boundary and reproducibility provenance.
